@@ -71,8 +71,9 @@ module OmniAuth
 
       def raw_info
         renren_body = Net::HTTP.post_form(URI.parse('http://api.renren.com/restserver.do'), signed_params).body
+        renren_body = renren_body.force_encoding('UTF-8').encode('UTF-16', :invalid => :replace).encode('UTF-8') if renren_body.respond_to?(:force_encoding)
         @raw_info ||= MultiJson.decode(renren_body)[0]
-        raise Ktv::Shared::GodDamnRenrenException(renren_body) if @raw_info.blank? or @raw_info['uid'].blank?
+        raise Ktv::Shared::GodDamnRenrenException.new(renren_body) if @raw_info.blank? or @raw_info['uid'].blank?
         @raw_info
       rescue ::Errno::ETIMEDOUT
         raise ::Timeout::Error
