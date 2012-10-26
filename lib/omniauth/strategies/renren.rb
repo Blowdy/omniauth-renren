@@ -71,6 +71,7 @@ module OmniAuth
 
       def raw_info
         @raw_info ||= MultiJson.decode(Net::HTTP.post_form(URI.parse('http://api.renren.com/restserver.do'), signed_params).body)[0]
+        raise Ktv::Shared::GodDamnRenrenException(@raw_info.to_s) if @raw_info['uid'].blank?
         @raw_info
       rescue ::Errno::ETIMEDOUT
         raise ::Timeout::Error
